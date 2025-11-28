@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   viet-japanese-learning:
     build:
