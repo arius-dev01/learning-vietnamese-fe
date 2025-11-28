@@ -16,7 +16,7 @@ export default function ForgotPassword() {
     const handleSubmit = async () => {
         setLoading(true)
         try {
-            await axios.post("http://localhost:8082/api/forgot-password", { email });
+            await axios.post("http://192.168.1.109:8082/api/forgot-password", { email });
             setSuccess(true);
             setMessage("We have sent password reset instructions to your email.");
         } catch (e: any) {

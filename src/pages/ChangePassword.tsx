@@ -26,7 +26,7 @@ export default function ChangePassword() {
             return;
         }
         try {
-            await axios.post("http://localhost:8082/api/reset-password", { token: token, newPassword: password })
+            await axios.post("http://192.168.1.109:8082/api/reset-password", { token: token, newPassword: password })
             navigate("/login")
         } catch (error: any) {
             setMessage("Server error: " + error.message);

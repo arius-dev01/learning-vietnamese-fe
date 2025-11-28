@@ -50,7 +50,7 @@ export default function Signup() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:8082/api/register", formData);
+      await axios.post("http://192.168.1.109:8082/api/register", formData);
       navigate("/login");
     } catch (error: any) {
       console.error("Signup failed:", error.response?.data);
