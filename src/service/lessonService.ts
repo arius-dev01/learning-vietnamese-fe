@@ -1,5 +1,5 @@
-import { LessonsResponse } from "../hooks/useLesson";
-import { LessonDTO } from "../types/Lession";
+import type { LessonsResponse } from "../hooks/useLesson";
+import type { LessonDTO } from "../types/Lession";
 import api from "./axiosClient";
 
 export async function getLessons(page: number,title: string, level: string | null, size: number): Promise<LessonsResponse> {

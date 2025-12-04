@@ -1,31 +1,45 @@
-import { UserResponse } from "../hooks/useUser";
-import { Role, UserDTO } from "../types/User";
+import type { UserResponse } from "../hooks/useUser";
+import type { Role, UserDTO } from "../types/User";
 import api from "./axiosClient";
 
 export const getInforUser = () => {
-    return api.get("/user/me");
+  return api.get("/user/me");
 };
 export const logout = () => {
-    return api.delete("/logout");
-}
+  return api.delete("/logout");
+};
 export const editProdile = (userDTO: UserDTO) => {
-    return api.put("/user/edit-profile", userDTO)
-}
+  return api.put("/user/edit-profile", userDTO);
+};
 
 export const addUser = (userDTO: UserDTO) => {
-    return api.post("/add", userDTO)
-}
-export async function getUsers(keyword: string, role: Role, page: number): Promise<UserResponse> {
-    const res = await api.get<UserResponse>("/user", { params: { keyword, role, page } });
-    return res.data;
+  return api.post("/add", userDTO);
+};
+
+export const editUser = (userDTO: UserDTO) => {
+  return api.put("/user/edit-user", userDTO);
+};
+export async function getUsers(
+  keyword: string,
+  role: Role,
+  page: number
+): Promise<UserResponse> {
+  const res = await api.get<UserResponse>("/user", {
+    params: { keyword, role, page },
+  });
+  return res.data;
 }
 
 export const changeRole = (userId: number, role: Role) => {
-    return api.put(`/update-role/${userId}/${role}`);
-}
+  return api.put(`/update-role/${userId}/${role}`);
+};
 export const translationLanguage = (language: string) => {
-    return api.put(`/user/translate-language`,null, { params: { language } });
-}
+  return api.put(`/user/translate-language`, null, { params: { language } });
+};
 export const deleteUser = (userId: number) => {
-    return api.delete(`/delete/${userId}`);
-}
+  return api.delete(`/delete/${userId}`);
+};
+
+export const getInfor = () => {
+  return api.get("/getInfor");
+};

@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import api from "../service/axiosClient";
 import { getUserAchievement } from "../service/userAchievement";
 import { getInforUser } from "../service/userService";
-import { UserDTO } from "../types/User";
-import { UserAchievementDTO } from "../types/userAchiemenet";
+import type { UserDTO } from "../types/User";
+import type { UserAchievementDTO } from "../types/userAchiemenet";
 
 export default function Profile() {
     const { t } = useTranslation();
@@ -53,7 +53,7 @@ export default function Profile() {
     return (
         <div className="bg-[#141f25] min-h-screen text-white py-10">
             <div className="max-w-[1200px] mx-auto space-y-6 px-4">
-                <button onClick={() => navigate("/home")}><FontAwesomeIcon icon={faArrowLeft} /></button>
+                <button className="cursor-pointer" onClick={() => navigate("/home")}><FontAwesomeIcon icon={faArrowLeft} /></button>
 
                 <div className="flex justify-between items-center gap-2">
                     <div>
@@ -62,7 +62,7 @@ export default function Profile() {
                             {t('Manage your personal information and preferences')}
                         </p>
                     </div>
-                    <button onClick={() => navigate("/edit-profile")} className="flex items-center gap-[2px] sm:gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-[10px] sm:text-sm transition">
+                    <button onClick={() => navigate("/edit-profile")} className="flex cursor-pointer items-center gap-[2px] sm:gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-[10px] sm:text-sm transition">
                         <FontAwesomeIcon icon={faPen} />
                         {t('Edit Profile')}
                     </button>

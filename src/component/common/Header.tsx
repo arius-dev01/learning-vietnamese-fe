@@ -5,85 +5,107 @@ import { useTranslation } from "react-i18next"; // ✅ Thêm import này
 import { logout } from "../../service/userService";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useAuth } from "../../context/useAuth";
+import Swal from "sweetalert2";
 
 export default function Header() {
-    const { t } = useTranslation(); // ✅ Thêm hook này
-    const {logout} = useAuth();
-    const handleLogout = async () => {
-        await logout();
-        logout();
-        window.location.href = "/login";
+  const { t } = useTranslation(); // ✅ Thêm hook này
+  const { logout } = useAuth();
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: t("Confirm Logout"),
+      text: t("Are you sure you want to log out?"),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: t("LOG OUT"),
+      cancelButtonText: t("Cancel"),
+      background: "#1a2d38",
+      color: "#fff",
+    });
+    if (result.isConfirmed) {
+      await logout();
+      window.location.href = "/login";
     }
+  };
 
-    const [showMenu, setShowMenu] = useState(false);
-    useEffect(() => {
-        if (showMenu) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
-        return () => {
-            document.body.style.overflow = 'auto';
-        };
-    }, [showMenu])
-    
-    return (
-        <header className='bg-[#14222a] text-white'>
-            <nav className='container mx-auto max-w-[1200px] w-full px-2 py-4 shadow-2xl flex justify-between relative '>
-                <a href="/home" className='text-2xl font-bold'>
-                    {t('Learn Vietnamese')} {/* ✅ Dùng translation */}
-                </a>
+  const [showMenu, setShowMenu] = useState(false);
+  useEffect(() => {
+    if (showMenu) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [showMenu]);
 
-                <div className="hidden md:flex items-center space-x-6">
-                    <a href="/home" className="hover:text-blue-200 transition">
-                        {t('Home')} {/* ✅ Dùng translation */}
-                    </a>
-                    <a href="/profile" className="hover:text-blue-200 transition">
-                        {t('Profile')} {/* ✅ Dùng translation */}
-                    </a>
-                    <button onClick={() => handleLogout()}
-                        className="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition">
-                        {t('LOG OUT')} {/* ✅ Dùng translation */}
-                    </button>
-                    <LanguageSwitcher />
+  return (
+    <header className="bg-[#14222a] text-white">
+      <nav className="container mx-auto max-w-[1200px] w-full px-2 py-4 shadow-2xl flex justify-between relative ">
+        <a href="/home" className="text-2xl font-bold">
+          {t("Learn Vietnamese")} {/* ✅ Dùng translation */}
+        </a>
 
-                </div>
+        <div className="hidden md:flex items-center space-x-6">
+          <a href="/home" className="hover:text-blue-200 transition">
+            {t("Home")} {/* ✅ Dùng translation */}
+          </a>
+          <a href="/profile" className="hover:text-blue-200 transition">
+            {t("Profile")} {/* ✅ Dùng translation */}
+          </a>
+          <LanguageSwitcher />
 
-                <button className="md:hidden block ">
-                    <FontAwesomeIcon onClick={() => setShowMenu(!showMenu)} icon={faBars} />
-                </button>
+          <button
+            onClick={() => handleLogout()}
+            className="border-2 cursor-pointer border-gray-500 px-4 py-2 text-white hover:bg-white hover:text-black rounded-xl"
+          >
+            {t("LOG OUT")} {/* ✅ Dùng translation */}
+          </button>
+        </div>
 
-                {showMenu && (
-                    <div className=" fixed top-0 right-0 h-full flex flex-col gap-2 bg-[#14222a] p-4 w-[300px] rounded shadow-lg z-50">
-                        <button className="text-white self-end" onClick={() => setShowMenu(false)}>
-                            <FontAwesomeIcon icon={faX} />
-                        </button>
-                        <div className="flex flex-col justify-center items-center flex-1 gap-6 text-lg">
-                            <a href="/" className="hover:text-blue-200 transition">
-                                {t('Home')} {/* ✅ Dùng translation */}
-                            </a>
-                            <a href="/profile" className="hover:text-blue-200 transition">
-                                {t('Profile')} {/* ✅ Dùng translation */}
-                            </a>
-                            <a href="/games" className="hover:text-blue-200 transition">
-                                Games {/* Có thể thêm vào translation file */}
-                            </a>
+        <button className="md:hidden block ">
+          <FontAwesomeIcon
+            onClick={() => setShowMenu(!showMenu)}
+            icon={faBars}
+          />
+        </button>
 
-                            {/* ✅ Thêm Language Switcher cho mobile */}
-                            <div className="mt-4">
-                                <LanguageSwitcher />
-                            </div>
-                        </div>
+        {showMenu && (
+          <div className=" fixed top-0 right-0 h-full flex flex-col gap-2 bg-[#14222a] p-4 w-[300px] rounded shadow-lg z-50">
+            <button
+              className="text-white self-end"
+              onClick={() => setShowMenu(false)}
+            >
+              <FontAwesomeIcon icon={faX} />
+            </button>
+            <div className="flex flex-col justify-center items-center flex-1 gap-6 text-lg">
+              <a href="/" className="hover:text-blue-200 transition">
+                {t("Home")} {/* ✅ Dùng translation */}
+              </a>
+              <a href="/profile" className="hover:text-blue-200 transition">
+                {t("Profile")} {/* ✅ Dùng translation */}
+              </a>
+              <a href="/games" className="hover:text-blue-200 transition">
+                Games {/* Có thể thêm vào translation file */}
+              </a>
 
-                        <button
-                            onClick={handleLogout}
-                            className="mt-auto w-full bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition"
-                        >
-                            {t('LOG OUT')} {/* ✅ Dùng translation */}
-                        </button>
-                    </div>
-                )}
-            </nav>
-        </header>
-    )
+              {/* ✅ Thêm Language Switcher cho mobile */}
+              <div className="mt-4">
+                <LanguageSwitcher />
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              className="mt-auto w-full bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition"
+            >
+              {t("LOG OUT")} {/* ✅ Dùng translation */}
+            </button>
+          </div>
+        )}
+      </nav>
+    </header>
+  );
 }

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getLessons } from "../service/lessonService";
-import { LessonDTO } from "../types/Lession";
+import type { LessonDTO } from "../types/Lession";
 export interface LessonsResponse {
     lesson: LessonDTO[];
     totalPage: number;

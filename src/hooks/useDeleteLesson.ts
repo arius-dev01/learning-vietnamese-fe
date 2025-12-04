@@ -3,14 +3,17 @@ import { toast } from "react-toastify";
 import { deleteLesson } from "../service/lessonService";
 
 export function useDeleteLesson() {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (id: number) => {
-            return deleteLesson(id);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['lessons'] });
-            toast.success('Lesson deleted successfully!');
-        }
-    })
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => {
+      return deleteLesson(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lessons"] });
+      toast.success("Lesson deleted successfully!");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to delete lesson");
+    },
+  });
 }

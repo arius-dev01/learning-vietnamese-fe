@@ -1,4 +1,4 @@
-import { AnswerDTO } from "../types/Question";
+import type { AnswerDTO } from "../types/Question";
 import api from "./axiosClient";
 
 export function startGame(typeGame?: string, lessonId?: number) {

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { deleteQuestion, updateQuestion } from "../../service/questionService";
-import { Question } from "../../types/Question";
+import type { Question } from "../../types/Question";
 
 interface AdminArrangeQuestionProps {
     isOpen: boolean;
@@ -38,6 +38,7 @@ export default function AdminArrangeQuestion({
             ...questions,
             {
                 id: newId,
+                audio_url: false,
                 questionText: `New Question ${newId}`,
                 sentence: [""],
                 options: [],
@@ -46,7 +47,6 @@ export default function AdminArrangeQuestion({
                 explanation: "",
                 lessonId: data[0]?.lessonId || 0,
                 gameId: data[0]?.gameId || 0,
-                audio_url: "",
                 questionTextJa: "",
                 explanationJa: "",
 
@@ -74,7 +74,7 @@ export default function AdminArrangeQuestion({
         }
     }
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 bg-opacity-40 flex items-center justify-center z-50">
             <div className="bg-white w-[700px] p-6 rounded-xl shadow-lg">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-4">

@@ -20,8 +20,6 @@ select:-webkit-autofill:focus {
   /* hack ngăn nháy màu */
 }
 
-
-
 input {
   outline: none;
   box-shadow: none;
@@ -30,4 +28,11 @@ input {
 textarea {
   outline: none;
   box-shadow: none;
+}
+
+/* button {
+  cursor: pointer;
+} */
+a {
+  cursor: pointer;
 }

@@ -1,73 +1,102 @@
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useNavigate, useParams } from 'react-router-dom'
-import Header from '../component/common/Header'
-import { findGameByLessonId } from '../service/gameService'
-import { GameDTO } from '../types/Game'
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import Header from "../component/common/Header";
+import { findGameByLessonId } from "../service/gameService";
+import type { GameDTO } from "../types/Game";
 
 export default function Game() {
-    const { lessonId } = useParams()
-    const navigate = useNavigate();
-    const [games, setGames] = useState<GameDTO[]>([]);
-    useEffect(() => {
-        document.title = "Game"
-    })
-    const { t } = useTranslation();
-    const idlesson = Number(lessonId);
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!lessonId) {
-                navigate("/");
-            }
-            const res = await findGameByLessonId(idlesson);
-            setGames(res.data.games);
+  const { lessonId } = useParams();
+  const navigate = useNavigate();
+  const [games, setGames] = useState<GameDTO[]>([]);
+  useEffect(() => {
+    document.title = "Game";
+  });
+  const { t } = useTranslation();
+  const idlesson = Number(lessonId);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!lessonId) {
+        navigate("/");
+      }
+      const res = await findGameByLessonId(idlesson);
+      setGames(res.data.games);
+    };
+    fetchData();
+  }, [lessonId]);
+  return (
+    <div className="bg-[#141f25] min-h-screen text-white">
+      <Header />
+      <div className="max-w-[1200px] mx-auto w-full mt-6 px-4">
+        <div className="flex items-center space-x-3 mb-6">
+          <button className="text-gray-300 cursor-pointer hover:text-white transition">
+            <FontAwesomeIcon
+              icon={faArrowLeft}
+              onClick={() => navigate(-1)}
+              size="lg"
+            />
+          </button>
+          <div>
+            <h2 className="text-xl font-bold">{t("Practice Games")}</h2>
+            <p className="text-sm text-gray-400">
+              {t("Choose a game type to start practicing")}
+            </p>
+          </div>
+        </div>
 
-        };
-        fetchData();
-    }, [lessonId]);
-    return (
-        <div className="bg-[#141f25] min-h-screen text-white">
-            <Header />
-            <div className="max-w-[1200px] mx-auto w-full mt-6 px-4">
-                <div className="flex items-center space-x-3 mb-6">
-                    <button className="text-gray-300 hover:text-white transition">
-                        <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)} size="lg" />
-                    </button>
-                    <div>
-                        <h2 className="text-xl font-bold">{t('Practice Games')}</h2>
-                        <p className="text-sm text-gray-400">
-                            {t('Choose a game type to start practicing')}
-                        </p>
-                    </div>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {games && games.length > 0 ? (
+            games.map((game) => (
+              <div
+                key={game.id}
+                className="flex flex-col items-center bg-[#1b262c] rounded-2xl p-6 shadow-lg hover:shadow-2xl transition transform "
+              >
+                <h2 className="font-semibold text-lg mb-2">{t(game.title)}</h2>
+                <p className="text-sm text-gray-400 text-center flex-1">
+                  {t(game.description)}
+                </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {
-                        games ? games.map((game) => (
-                            <div
-                                className="flex flex-col items-center bg-[#1b262c] rounded-2xl p-6 shadow-lg hover:shadow-2xl transition transform "
-                            >
-                                <h2 className="font-semibold text-lg mb-2">{t(game.title)}</h2>
-                                <p className="text-sm text-gray-400 text-center flex-1">
-                                    {t(game.description)}
-                                </p>
+                <button
+                  onClick={() => {
+                    const slug = game.title.replace(/\s+/g, "-");
+                    game.type === "MC" || game.type === "LS"
+                      ? navigate(
+                          `/quiz/game/${slug.toLowerCase()}/mc/${lessonId}`
+                        )
+                      : navigate(
+                          `/quiz/game/${slug.toLowerCase()}/as/${lessonId}`
+                        );
+                  }}
+                  className="mt-4 cursor-pointer w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-xl transition"
+                >
+                  {t("Start Game")}
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+              <div className="text-6xl mb-4">🎮</div>
+              <h3 className="text-xl font-semibold text-gray-300 mb-2">
+                {t("No games available")}
+              </h3>
+              <p className="text-gray-400 mb-6">
+                {t(
+                  "Games for this lesson are coming soon. Please check back later!"
+                )}
+              </p>
+              <button
+                onClick={() => navigate(-1)}
+                className="px-6 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white font-medium cursor-pointer transition-colors"
+              >
+                {t("Go Back")}
+              </button>
+            </div>
+          )}
+        </div>
 
-                                <button
-                                    onClick={() => {
-                                        const slug = game.title.replace(/\s+/g, "-");
-                                        (game.type === 'MC' || game.type === 'LS') ? navigate(`/quiz/game/${slug.toLowerCase()}/mc/${lessonId}`) : navigate(`/quiz/game/${slug.toLowerCase()}/as/${lessonId}`)
-                                    }}
-                                    className="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-xl transition"
-                                >
-                                    {t('Start Game')}
-                                </button>
-                            </div>
-                        )) : <div>No games available</div>
-                    }
-
-                    {/* <div
+        {/* <div
                         className="flex flex-col items-center bg-[#1b262c] rounded-2xl p-6 shadow-lg hover:shadow-2xl transition transform "
                     >
                         <h2 className="font-semibold text-lg mb-2">Listen & Choose</h2>
@@ -95,8 +124,7 @@ export default function Game() {
                             Start Game
                         </button>
                     </div> */}
-                </div>
-            </div>
-        </div>
-    )
+      </div>
+    </div>
+  );
 }

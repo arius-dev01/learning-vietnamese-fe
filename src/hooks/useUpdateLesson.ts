@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { updateLesson } from '../service/lessonService';
-import { LessonDTO } from '../types/Lession';
+import type { LessonDTO } from '../types/Lession';
 
 export const useUpdateLesson = () => {
   const queryClient = useQueryClient();
@@ -13,7 +13,7 @@ export const useUpdateLesson = () => {
       toast.success('Lesson updated successfully!');
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to update lesson');
+      toast.error(error.response.data.message || 'Failed to update lesson');
     },
   });
 };

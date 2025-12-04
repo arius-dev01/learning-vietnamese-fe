@@ -10,7 +10,7 @@ export function useDeleteRole() {
         },
         onSuccess: () => {
             useQuery.invalidateQueries({ queryKey: ['users'] });
-            toast.success("Delete role successfully");
+            toast.success("Delete user successfully");
         }
     })
 }

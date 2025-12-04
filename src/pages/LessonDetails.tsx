@@ -8,7 +8,7 @@ import Footer from '../component/common/Footer';
 import Header from '../component/common/Header';
 import api from '../service/axiosClient';
 import { getLessonByTitle } from '../service/lessonService';
-import { LessonDTO } from '../types/Lession';
+import type { LessonDTO } from '../types/Lession';
 
 export default function LessonDetails() {
   const [actions, setActions] = useState('Content');
@@ -55,7 +55,7 @@ export default function LessonDetails() {
         {lessonDetails && (
           <div className='max-w-[1200px] mx-auto w-full  px-4 py-4'>
             <div className='flex gap-3 items-center'>
-              <button onClick={() => navigate("/home")}><FontAwesomeIcon icon={faArrowLeft} /></button>
+              <button className='cursor-pointer' onClick={() => navigate("/home")}><FontAwesomeIcon icon={faArrowLeft} /></button>
               <span>{t('Back to Lessons')}</span>
             </div>
             <div className='grid grid-cols-1 sm:grid-cols-5 gap-8 '>
@@ -67,8 +67,8 @@ export default function LessonDetails() {
                   <div className='sm:col-span-3 lg:col-span-2'>
                     {/* Tabs */}
                     <div className='flex gap-4 border-b border-gray-600 py-4 mb-6'>
-                      <button onClick={() => setActions("Content")} className={`pb-2 ${actions === "Content" ? "text-orange-400 transition-all border-b-2 border-orange-500" : "text-gray-400 hover:text-white"}`}>{t('Content')}</button>
-                      <button onClick={() => setActions("Vocabulary")} className={`pb-2 ${actions === "Vocabulary" ? "text-orange-400 transition-all border-b-2 border-orange-500" : "text-gray-400 hover:text-white"}`}>{t('Vocabulary')}</button>
+                      <button onClick={() => setActions("Content")} className={`cursor-pointer pb-2 ${actions === "Content" ? "text-orange-400 transition-all border-b-2 border-orange-500" : "text-gray-400 hover:text-white"}`}>{t('Content')}</button>
+                      <button onClick={() => setActions("Vocabulary")} className={`cursor-pointer pb-2 ${actions === "Vocabulary" ? "text-orange-400 transition-all border-b-2 border-orange-500" : "text-gray-400 hover:text-white"}`}>{t('Vocabulary')}</button>
                     </div>
 
                     {/* Nội dung tabs */}
@@ -107,7 +107,7 @@ export default function LessonDetails() {
                             <div key={index} className='bg-[#1b262c] p-2 rounded-lg border border-gray-600'>
                               <div className='flex justify-between items-start mb-2'>
                                 <h4 className='text-lg font-semibold text-white'>{word.word}</h4>
-                                <button onClick={() => speakText(word.word)} className='text-blue-400 hover:text-blue-300'>
+                                <button onClick={() => speakText(word.word)} className='cursor-pointer text-blue-400 hover:text-blue-300'>
                                   🔊
                                 </button>
                               </div>
@@ -125,13 +125,13 @@ export default function LessonDetails() {
                 <div className='bg-[#1b262c] rounded-lg border border-gray-600 p-6 mb-6'>
                   <h3 className='text-lg font-semibold mb-4'>{t('Learning Options')}</h3>
                   <div className='space-y-3'>
-                    <button onClick={() => navigate(`/lessons-video/${lessonDetails.title.toLowerCase().replace(/\s+/g, '-')}`)} className='w-full bg-gray-800 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors flex items-center justify-center'>
+                    <button onClick={() => navigate(`/lessons-video/${lessonDetails.title.toLowerCase().replace(/\s+/g, '-')}`)} className='w-full cursor-pointer bg-gray-800 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors flex items-center justify-center'>
                       <svg className='w-5 h-5 mr-2' fill='currentColor' viewBox='0 0 20 20'>
                         <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z' clipRule='evenodd' />
                       </svg>
                       {t('Watch Video Lesson')}
                     </button>
-                    <button onClick={() => navigate(`/game/${lessonDetails.id}`)} className='w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center'>
+                    <button onClick={() => navigate(`/game/${lessonDetails.id}`)} className='w-full cursor-pointer bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center'>
                       <svg className='w-5 h-5 mr-2' fill='currentColor' viewBox='0 0 20 20'>
                         <path fillRule='evenodd' d='M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z' clipRule='evenodd' />
                       </svg>
