@@ -13,8 +13,11 @@ interface ModalLessonProps {
 
 interface FormErrors {
   title?: string;
+  titleJa?: string;
   describe?: string;
+  describeJa?: string;
   content?: string;
+  contentJa?: string;
   video_url?: string;
 }
 
@@ -40,11 +43,21 @@ export default function ModalLesson({
       newErrors.title = "Title must be less than 100 characters";
     }
 
+    // Validate title Japanese
+    if (!formData.titleJa?.trim()) {
+      newErrors.titleJa = "Lesson title (Japanese) is required";
+    }
+
     // Validate description
     if (!formData.describe.trim()) {
       newErrors.describe = "Description is required";
     } else if (formData.describe.trim().length < 10) {
       newErrors.describe = "Description must be at least 10 characters";
+    }
+
+    // Validate description Japanese
+    if (!formData.describeJa?.trim()) {
+      newErrors.describeJa = "Description (Japanese) is required";
     }
 
     // Validate content
@@ -54,14 +67,12 @@ export default function ModalLesson({
       newErrors.content = "Content must be at least 20 characters";
     }
 
-    // Validate video URL (optional but must be valid if provided)
-    if (formData.video_url && formData.video_url.trim()) {
-      const urlPattern =
-        /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|vimeo\.com)\/.+$/i;
-      if (!urlPattern.test(formData.video_url.trim())) {
-        newErrors.video_url = "Please enter a valid YouTube or Vimeo URL";
-      }
+    // Validate content Japanese
+    if (!formData.contentJa?.trim()) {
+      newErrors.contentJa = "Content (Japanese) is required";
     }
+
+    // Video URL is optional - no validation needed
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -180,16 +191,25 @@ export default function ModalLesson({
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Lesson Title (Japanese)
+                      Lesson Title (Japanese) *
                     </label>
                     <input
                       type="text"
                       name="titleJa"
                       value={formData.titleJa || ""}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium tracking-tight"
+                      className={`w-full px-4 py-3 border rounded-lg text-sm font-medium tracking-tight ${
+                        errors.titleJa
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-200"
+                      }`}
                       placeholder="レッスンタイトルを入力..."
                     />
+                    {errors.titleJa && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.titleJa}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -232,16 +252,23 @@ export default function ModalLesson({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description (Japanese)
+                    Description (Japanese) *
                   </label>
                   <textarea
                     name="describeJa"
                     value={formData.describeJa || ""}
                     onChange={handleInputChange}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-0 text-sm font-medium tracking-tight resize-none"
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-0 text-sm font-medium tracking-tight resize-none ${
+                      errors.describeJa ? "border-red-500" : "border-gray-200"
+                    }`}
                     placeholder="レッスンの説明を入力..."
                   />
+                  {errors.describeJa && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.describeJa}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
@@ -304,16 +331,23 @@ export default function ModalLesson({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Content (Japanese)
+                    Content (Japanese) *
                   </label>
                   <textarea
                     name="contentJa"
                     value={formData.contentJa || ""}
                     onChange={handleInputChange}
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-0 text-sm font-medium tracking-tight resize-none"
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-0 text-sm font-medium tracking-tight resize-none ${
+                      errors.contentJa ? "border-red-500" : "border-gray-200"
+                    }`}
                     placeholder="レッスン内容を入力..."
                   />
+                  {errors.contentJa && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.contentJa}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

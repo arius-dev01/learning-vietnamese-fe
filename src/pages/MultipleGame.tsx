@@ -91,11 +91,14 @@ const MultipleGame: React.FC = () => {
       }
 
       if (res.data.complete) {
-        setIsCompleted(true);
         setTotalScore(res.data.totalScore);
         if (res.data.bonus > 0) {
           setBonusScore((i) => i + 20);
         }
+        // Đợi 2s trước khi hiển thị màn hình tổng kết
+        setTimeout(() => {
+          setIsCompleted(true);
+        }, 2000);
       }
       console.log("Submit response:", res.data);
     } catch (error) {

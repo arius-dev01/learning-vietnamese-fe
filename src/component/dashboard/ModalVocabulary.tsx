@@ -93,6 +93,7 @@ export default function ModalVocabulary({
     }
   };
   if (!isOpen) return null;
+  console.log(lessonData)
   const options = lessonData?.lesson?.map((l) => ({
     value: l.id,
     label: l.title,

@@ -7,7 +7,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAddUser } from "../../hooks/useAddUser";
 import { toast } from "react-toastify";
 import type { UserDTO } from "../../types/User";
@@ -56,6 +56,48 @@ export default function ModalUser({
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+
+  // Reset formData when user or mode changes
+  useEffect(() => {
+    if (mode === "add") {
+      setFormData({
+        id: 0,
+        fullName: "",
+        email: "",
+        password: "",
+        phoneNumber: "",
+        location: "",
+        avatar: "",
+        createdAt: "",
+        updatedAt: "",
+        bio: "",
+        birthdate: "",
+        gender: "MALE",
+        language: "vietnamese",
+        newPassword: "",
+        roleName: "USER",
+      });
+    } else if (user) {
+      setFormData({
+        id: user.id || 0,
+        fullName: user.fullName || "",
+        email: user.email || "",
+        password: "",
+        phoneNumber: user.phoneNumber || "",
+        location: user.location || "",
+        avatar: user.avatar || "",
+        createdAt: user.createdAt || "",
+        updatedAt: user.updatedAt || "",
+        bio: user.bio || "",
+        birthdate: user.birthdate || "",
+        gender: user.gender || "MALE",
+        language: user.language || "vietnamese",
+        newPassword: "",
+        roleName: user.roleName || "USER",
+      });
+    }
+    setErrors({});
+  }, [user, mode]);
 
   const { mutateAsync: addUser } = useAddUser();
   const { mutateAsync: editUser } = useEditUser();
@@ -182,6 +224,11 @@ export default function ModalUser({
                 ? "Update user information and settings"
                 : "Add a new user to the system"}
             </p>
+            {mode === "add" && (
+              <p className="text-amber-600 text-sm mt-1">
+                Note: Default password will be <strong>12345678</strong>
+              </p>
+            )}
           </div>
           <button
             onClick={() => {

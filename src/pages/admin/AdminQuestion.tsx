@@ -22,6 +22,7 @@ export default function AdminLessonGames() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModaArrangelOpen, setIsModaArrangeModalOpen] = useState(false);
   const [page, setPage] = useState(0);
+    const [editGameType, setEditGameType] = useState<"MC" | "LS">("MC");
   console.log(page);
   const { mutateAsync: mutateQuery } = useQueryGameDetail();
   const [mcData, setMcData] = useState<Question[]>([]);
@@ -32,6 +33,7 @@ export default function AdminLessonGames() {
     gameId: number
   ): Promise<Question[]> => {
     const res = await mutateQuery({ lessonId, gameId });
+    console.log(res);
     return res.data;
   };
   const [selectedLessonId, setSelectedLessonId] = useState<number>();
@@ -170,6 +172,7 @@ export default function AdminLessonGames() {
                       onClick={() => {
                         if (it.type === "MC" || it.type === "LS") {
                           setIsModalOpen(true);
+                          setEditGameType(it.type as "MC" | "LS");
                           handleEdit(it.lessonId, it.gameTypeId).then((res) =>
                             setMcData(res)
                           );
@@ -239,6 +242,7 @@ export default function AdminLessonGames() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           data={mcData}
+          gameType={editGameType}
         />
       )}
       {isModaArrangelOpen && (

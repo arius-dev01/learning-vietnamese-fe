@@ -45,7 +45,6 @@ export default function AdminImportExcelModalQ({
       document.body.appendChild(link);
       link.click();
       link.parentNode?.removeChild(link);
-      toast.success("Template downloaded successfully!");
     } catch (error: any) {
       console.error("Error downloading template:", error);
       toast.error("Failed to download template");

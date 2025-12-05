@@ -9,16 +9,26 @@ interface EditQuestionProps {
   isOpen: boolean;
   onClose: () => void;
   data?: Question[];
+  gameType?: "MC" | "LS";
+}
+
+interface ValidationErrors {
+  [key: string]: string;
 }
 
 export default function AdminEditQuestion({
   isOpen,
   onClose,
   data = [],
+  gameType = "MC",
 }: EditQuestionProps) {
   const [formData, setFormData] = useState<Question[]>([]);
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  console.log(data);
+
   useEffect(() => {
     setFormData(data);
+    setErrors({});
   }, [data]);
 
   if (!isOpen) return null;
@@ -35,11 +45,73 @@ export default function AdminEditQuestion({
     const newData = [...formData];
     newData[qIndex] = { ...newData[qIndex], [field]: value };
     setFormData(newData);
+    // Clear error when typing
+    const errorKey = `${qIndex}-${field}`;
+    if (errors[errorKey]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[errorKey];
+        return newErrors;
+      });
+    }
   };
+
+  const validateForm = (): boolean => {
+    const newErrors: ValidationErrors = {};
+
+    formData.forEach((q, qIndex) => {
+      // Validate question text
+      if (!q.questionText || !q.questionText.trim()) {
+        newErrors[`${qIndex}-questionText`] =
+          "Question text (Vietnamese) is required";
+      }
+
+      // Validate question text Japanese (only if not audio)
+      if (!q.audio_url && (!q.questionTextJa || !q.questionTextJa.trim())) {
+        newErrors[`${qIndex}-questionTextJa`] =
+          "Question text (Japanese) is required";
+      }
+
+      // Validate explanation
+      if (!q.explanation || !q.explanation.trim()) {
+        newErrors[`${qIndex}-explanation`] =
+          "Explanation (Vietnamese) is required";
+      }
+
+      // Validate explanation Japanese
+      if (!q.explanationJa || !q.explanationJa.trim()) {
+        newErrors[`${qIndex}-explanationJa`] =
+          "Explanation (Japanese) is required";
+      }
+
+      // Validate options
+      q.options.forEach((opt, oIndex) => {
+        if (!opt.content || !opt.content.trim()) {
+          newErrors[
+            `${qIndex}-option-${oIndex}`
+          ] = `Option ${String.fromCharCode(65 + oIndex)} is required`;
+        }
+      });
+
+      // Validate at least one correct option
+      const hasCorrectOption = q.options.some((opt) => opt.correct);
+      if (!hasCorrectOption) {
+        newErrors[`${qIndex}-correctOption`] = "Please select a correct answer";
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = async () => {
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     try {
       await updateQuestion(data[0].gameId, data[0].lessonId, formData);
-      console.log(formData);
 
       toast.success("Questions updated successfully!");
       onClose();
@@ -48,7 +120,18 @@ export default function AdminEditQuestion({
     }
   };
 
-  const handleDeleteQuestion = async (questionId: number, gameId: number) => {
+  const handleDeleteQuestion = async (
+    questionId: number,
+    gameId: number,
+    questionIndex: number
+  ) => {
+    // Nếu question mới (questionId === 0) thì chỉ xóa trên UI, không call API
+    if (questionId === 0) {
+      setFormData(formData.filter((_, idx) => idx !== questionIndex));
+      toast.success("Question removed!");
+      return;
+    }
+
     try {
       await deleteQuestion(questionId, gameId);
       toast.success("Question deleted successfully!");
@@ -58,35 +141,22 @@ export default function AdminEditQuestion({
     }
   };
   const addQuestion = () => {
+    // Tạo 4 options cho MC, 6 options cho LS
+    const optionCount = gameType === "LS" ? 6 : 4;
+    const options = Array.from({ length: optionCount }, () => ({
+      id: 0,
+      content: "",
+      correct: false,
+    }));
+
     setFormData([
       ...formData,
       {
         id: 0,
         questionText: "",
         sentence: [""],
-        audio_url: false,
-        options: [
-          {
-            id: 0,
-            content: "",
-            correct: false,
-          },
-          {
-            id: 0,
-            content: "",
-            correct: false,
-          },
-          {
-            id: 0,
-            content: "",
-            correct: false,
-          },
-          {
-            id: 0,
-            content: "",
-            correct: false,
-          },
-        ],
+        audio_url: gameType === "LS", // LS thì có audio
+        options,
         image_url: "",
         questionId: 0,
         explanation: "",
@@ -108,6 +178,28 @@ export default function AdminEditQuestion({
       content: value,
     };
     setFormData(newData);
+    // Clear error when typing
+    const errorKey = `${qIndex}-option-${oIndex}`;
+    if (errors[errorKey]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[errorKey];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleCorrectOptionWithClear = (qIndex: number, oIndex: number) => {
+    handleCorrectOption(qIndex, oIndex);
+    // Clear correct option error
+    const errorKey = `${qIndex}-correctOption`;
+    if (errors[errorKey]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[errorKey];
+        return newErrors;
+      });
+    }
   };
 
   return (
@@ -131,7 +223,9 @@ export default function AdminEditQuestion({
                 className="border border-gray-200 p-4 rounded-lg space-y-3 relative"
               >
                 <button
-                  onClick={() => handleDeleteQuestion(q.questionId, q.gameId)}
+                  onClick={() =>
+                    handleDeleteQuestion(q.questionId, q.gameId, qIndex)
+                  }
                   className="absolute -right-2 -top-2 cursor-pointer w-5 h-5  text-sm text-white rounded-full bg-red-500"
                 >
                   <FontAwesomeIcon icon={faX} className="" />
@@ -143,7 +237,13 @@ export default function AdminEditQuestion({
 
                 <div className="space-y-1">
                   <label className="block text-sm font-medium text-gray-700">
-                    Question Text (Vietnamese) {q.audio_url && <span className="text-blue-500 text-xs ml-1">🔊 Audio</span>}
+                    Question Text (Vietnamese){" "}
+                    <span className="text-red-500">*</span>{" "}
+                    {q.audio_url && (
+                      <span className="text-blue-500 text-xs ml-1">
+                        🔊 Audio
+                      </span>
+                    )}
                   </label>
                   <input
                     type="text"
@@ -152,14 +252,24 @@ export default function AdminEditQuestion({
                       handleChange(qIndex, "questionText", e.target.value)
                     }
                     placeholder="Enter question text in Vietnamese..."
-                    className="w-full p-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className={`w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors[`${qIndex}-questionText`]
+                        ? "border-red-500"
+                        : "border-gray-200"
+                    }`}
                   />
+                  {errors[`${qIndex}-questionText`] && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors[`${qIndex}-questionText`]}
+                    </p>
+                  )}
                 </div>
 
                 {!q.audio_url && (
                   <div className="space-y-1">
                     <label className="block text-sm font-medium text-gray-700">
-                      Question Text (Japanese)
+                      Question Text (Japanese){" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -168,14 +278,24 @@ export default function AdminEditQuestion({
                         handleChange(qIndex, "questionTextJa", e.target.value)
                       }
                       placeholder="Enter question text in Japanese..."
-                      className="w-full p-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className={`w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                        errors[`${qIndex}-questionTextJa`]
+                          ? "border-red-500"
+                          : "border-gray-200"
+                      }`}
                     />
+                    {errors[`${qIndex}-questionTextJa`] && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors[`${qIndex}-questionTextJa`]}
+                      </p>
+                    )}
                   </div>
                 )}
 
                 <div className="space-y-1">
                   <label className="block text-sm font-medium text-gray-700">
-                    Explanation (Vietnamese)
+                    Explanation (Vietnamese){" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     value={q.explanation || ""}
@@ -183,14 +303,24 @@ export default function AdminEditQuestion({
                       handleChange(qIndex, "explanation", e.target.value)
                     }
                     placeholder="Enter explanation in Vietnamese..."
-                    className="w-full p-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className={`w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors[`${qIndex}-explanation`]
+                        ? "border-red-500"
+                        : "border-gray-200"
+                    }`}
                     rows={3}
                   />
+                  {errors[`${qIndex}-explanation`] && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors[`${qIndex}-explanation`]}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-1">
                   <label className="block text-sm font-medium text-gray-700">
-                    Explanation (Japanese)
+                    Explanation (Japanese){" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     value={q.explanationJa || ""}
@@ -198,40 +328,69 @@ export default function AdminEditQuestion({
                       handleChange(qIndex, "explanationJa", e.target.value)
                     }
                     placeholder="Enter explanation in Japanese..."
-                    className="w-full p-2 border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className={`w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors[`${qIndex}-explanationJa`]
+                        ? "border-red-500"
+                        : "border-gray-200"
+                    }`}
                     rows={3}
                   />
+                  {errors[`${qIndex}-explanationJa`] && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors[`${qIndex}-explanationJa`]}
+                    </p>
+                  )}
                 </div>
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Answer Options
+                    Answer Options <span className="text-red-500">*</span>
                   </label>
+                  {errors[`${qIndex}-correctOption`] && (
+                    <p className="text-red-500 text-xs mb-2">
+                      {errors[`${qIndex}-correctOption`]}
+                    </p>
+                  )}
                   <div className="space-y-2">
                     {q.options.map((opt, oIndex) => (
-                      <div key={opt.id} className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-500 w-6">
-                          {String.fromCharCode(65 + oIndex)}.
-                        </span>
-                        <input
-                          type="text"
-                          value={opt.content}
-                          onChange={(e) =>
-                            handleOptionChange(qIndex, oIndex, e.target.value)
-                          }
-                          placeholder={`Option ${String.fromCharCode(
-                            65 + oIndex
-                          )}...`}
-                          className="flex-1 p-2  border border-gray-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                        <label className="flex items-center gap-1 cursor-pointer">
+                      <div key={opt.id} className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-500 w-6">
+                            {String.fromCharCode(65 + oIndex)}.
+                          </span>
                           <input
-                            type="radio"
-                            className="cursor-pointer w-4 h-4 text-green-600"
-                            checked={opt.correct}
-                            onChange={() => handleCorrectOption(qIndex, oIndex)}
+                            type="text"
+                            value={opt.content}
+                            onChange={(e) =>
+                              handleOptionChange(qIndex, oIndex, e.target.value)
+                            }
+                            placeholder={`Option ${String.fromCharCode(
+                              65 + oIndex
+                            )}...`}
+                            className={`flex-1 p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                              errors[`${qIndex}-option-${oIndex}`]
+                                ? "border-red-500"
+                                : "border-gray-200"
+                            }`}
                           />
-                          <span className="text-sm text-gray-600">Correct</span>
-                        </label>
+                          <label className="flex items-center gap-1 cursor-pointer">
+                            <input
+                              type="radio"
+                              className="cursor-pointer w-4 h-4 text-green-600"
+                              checked={opt.correct}
+                              onChange={() =>
+                                handleCorrectOptionWithClear(qIndex, oIndex)
+                              }
+                            />
+                            <span className="text-sm text-gray-600">
+                              Correct
+                            </span>
+                          </label>
+                        </div>
+                        {errors[`${qIndex}-option-${oIndex}`] && (
+                          <p className="text-red-500 text-xs ml-6">
+                            {errors[`${qIndex}-option-${oIndex}`]}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -241,7 +400,7 @@ export default function AdminEditQuestion({
             <span className="flex justify-end">
               <button
                 onClick={addQuestion}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               >
                 Add Question
               </button>

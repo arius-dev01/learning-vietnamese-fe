@@ -16,7 +16,7 @@ export default function ForgotPassword() {
     const handleSubmit = async () => {
         setLoading(true)
         try {
-            await axios.post("http://192.168.1.109:8082/api/forgot-password", { email });
+            await axios.post( `${import.meta.env.VITE_API_URL}/forgot-password`, { email });
             setSuccess(true);
             setMessage("We have sent password reset instructions to your email.");
         } catch (e: any) {
@@ -62,7 +62,7 @@ export default function ForgotPassword() {
                                 className={`mt-5 flex gap-2 items-center justify-center w-full 
                                 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 
                                 rounded-xl transition-all shadow-md
-                                ${loading || !email ? "opacity-70 cursor-not-allowed" : ""}`}
+                                ${loading || !email ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
                             >
                                 {loading && <FontAwesomeIcon icon={faSpinner} spin />}
                                 {loading ? "Submitting..." : "Submit"}
