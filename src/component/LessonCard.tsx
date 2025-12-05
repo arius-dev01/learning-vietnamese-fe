@@ -108,6 +108,19 @@ export default function LessonCard() {
               ▼
             </span>
           </div>
+
+          {(searchTerm || level) && (
+            <button
+              onClick={() => {
+                handleSearchChange("");
+                handleLevelChange("");
+              }}
+              className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors duration-200 cursor-pointer"
+            >
+              <FontAwesomeIcon icon={faXmark} className="text-sm" />
+              {t("Clear All")}
+            </button>
+          )}
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -211,7 +224,6 @@ export default function LessonCard() {
           )}
         </div>
       </div>
-      {/* Pagination */}
       {totalPages && lessons.length > 0 && (
         <div className="flex items-center justify-center gap-2 mt-8">
           <button
